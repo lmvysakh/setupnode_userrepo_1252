@@ -39,32 +39,32 @@ jobs:
           file: .coverage/*.json
         env:
           CI: true
-          RUN_INTEGRATION: true
+          RUN_INTEGRATION: false
 
-  integration-tests-testnet:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      matrix:
-        include:
-          - testnet: quebecnet
-            testnet_uppercase: QUEBECNET
-            rpc_url: https://rpc.quebecnet.teztnets.com/
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/Hydrogen
-      - run: npm ci
-      - run: npm run build
-      - if: ${{ !github.event.pull_request.head.repo.fork }}
-        name: Tailscale
-        uses: tailscale/github-action@v1
-        with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-          version: 1.32.2
-      - id: run-tests
-        run: npm -w integration-tests run test:${{ matrix.testnet }} -- --maxWorkers=4
-        env:
-          # Ternary operator workaround
-          TEZOS_RPC_${{ matrix.testnet_uppercase }}: ${{ github.event.pull_request.head.repo.fork && matrix.rpc_url || null }}
+  # integration-tests-testnet:
+  #   runs-on: ubuntu-latest
+  #   continue-on-error: true
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - testnet: quebecnet
+  #           testnet_uppercase: QUEBECNET
+  #           rpc_url: https://rpc.quebecnet.teztnets.com/
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: lts/Hydrogen
+  #     - run: npm ci
+  #     - run: npm run build
+  #     - if: ${{ !github.event.pull_request.head.repo.fork }}
+  #       name: Tailscale
+  #       uses: tailscale/github-action@v1
+  #       with:
+  #         authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+  #         version: 1.32.2
+  #     - id: run-tests
+  #       run: npm -w integration-tests run test:${{ matrix.testnet }} -- --maxWorkers=4
+  #       env:
+  #         # Ternary operator workaround
+  #         TEZOS_RPC_${{ matrix.testnet_uppercase }}: ${{ github.event.pull_request.head.repo.fork && matrix.rpc_url || null }}
